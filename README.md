@@ -1,5 +1,4 @@
 #babel-plugin-which-builtins
-============================
 
 This is a Babel plugin which attempts to determine which ECMAScript 2015/2016/2017
 library built-ins are used by a codebase and only import polyfills for just the
@@ -7,7 +6,6 @@ built-ins which are actually used. It is a replacement for importing the
 entirety of `babel-polyfill`.
 
 ##Instructions
-============
 
 First install the plugin to your project, along with `core-js` and `regenerator-runtime`:
 
@@ -25,7 +23,6 @@ code. For example, in a `.babelrc` file:
 ```
 
 ##What does it do?
-==================
 
 When this plugin encounters code that seems to use new built-in JavaScript global
 objects, static methods, or instance methods, it adds an `import` declaration
@@ -52,7 +49,6 @@ and polyfills references to `regeneratorRuntime`, which are created by the stand
 Babel plugin for transforming generators.
 
 ##When does the plugin fail?
-============================
 
 Unfortunately, in a completely dynamic language like JavaScript, static analysis
 can only go so far, and as a result `babel-plugin-which-builtins` cannot catch
@@ -101,7 +97,7 @@ var { [getCos()]: k } = Math;
 ```
 
 ##Instance methods may produce false positives
-==============================================
+
 Some of the new built-ins in ES2015/2016/2017 are instance methods, like
 `Array.prototype.find` or `String.prototype.startsWith`. It's very difficult
 (bordering on impossible) to statically figure out the type of a variable
@@ -127,79 +123,78 @@ The theory here is that including an instance method polyfill when it's not
 needed is better than not including it when it is needed.
 
 #What features are polyfilled?
-==============================
 * Generators
-*  `regeneratorRuntime`
+ * `regeneratorRuntime`
 * Global objects
-*  `DataView`
-*  `Int8Array`
-*  `Uint8Array`
-*  `Uint8ClampedArray`
-*  `Int16Array`
-*  `Uint16Array`
-*  `Int32Array`
-*  `Uint32Array`
-*  `Float32Array`
-*  `Float64Array`
-*  `Map`
-*  `Set`
-*  `WeakMap`
-*  `WeakSet`
-*  `Promise`
-*  `Symbol`
-*  `Reflect`
+ * `DataView`
+ * `Int8Array`
+ * `Uint8Array`
+ * `Uint8ClampedArray`
+ * `Int16Array`
+ * `Uint16Array`
+ * `Int32Array`
+ * `Uint32Array`
+ * `Float32Array`
+ * `Float64Array`
+ * `Map`
+ * `Set`
+ * `WeakMap`
+ * `WeakSet`
+ * `Promise`
+ * `Symbol`
+ * `Reflect`
 * Static methods
-*  `Array.from`
-*  `Array.of`
-*  `Math.acosh`
-*  `Math.asinh`
-*  `Math.atanh`
-*  `Math.cbrt`
-*  `Math.clz32`
-*  `Math.cosh`
-*  `Math.expm1`
-*  `Math.fround`
-*  `Math.hypot`
-*  `Math.imul`
-*  `Math.log1p`
-*  `Math.log10`
-*  `Math.log2`
-*  `Math.sign`
-*  `Math.sinh`
-*  `Math.tanh`
-*  `Math.trunc`
-*  `Number.isFinite`
-*  `Number.isInteger`
-*  `Number.isSafeInteger`
-*  `Number.isNaN`
-*  `Number.EPSILON`
-*  `Number.MIN_SAFE_INTEGER`
-*  `Number.MAX_SAFE_INTEGER`
-*  `Object.assign`
-*  `Object.is`
-*  `Object.getOwnPropertySymbols`
-*  `Object.setPrototypeOf`
-*  `Object.values`
-*  `Object.entries`
-*  `Object.getOwnPropertyDescriptors`
-*  `String.raw`
+ * `Array.from`
+ * `Array.of`
+ * `Math.acosh`
+ * `Math.asinh`
+ * `Math.atanh`
+ * `Math.cbrt`
+ * `Math.clz32`
+ * `Math.cosh`
+ * `Math.expm1`
+ * `Math.fround`
+ * `Math.hypot`
+ * `Math.imul`
+ * `Math.log1p`
+ * `Math.log10`
+ * `Math.log2`
+ * `Math.sign`
+ * `Math.sinh`
+ * `Math.tanh`
+ * `Math.trunc`
+ * `Number.isFinite`
+ * `Number.isInteger`
+ * `Number.isSafeInteger`
+ * `Number.isNaN`
+ * `Number.EPSILON`
+ * `Number.MIN_SAFE_INTEGER`
+ * `Number.MAX_SAFE_INTEGER`
+ * `Object.assign`
+ * `Object.is`
+ * `Object.getOwnPropertySymbols`
+ * `Object.setPrototypeOf`
+ * `Object.values`
+ * `Object.entries`
+ * `Object.getOwnPropertyDescriptors`
+ * `String.raw`
 * Instance methods
-*  `Array.prototype.copyWithin`
-*  `Array.prototype.find`
-*  `Array.prototype.findIndex`
-*  `Array.prototype.fill`
-*  `Array.prototype.includes`
-*  `Function.prototype.name`
-*  `RegExp.prototype.flags`
-*  `RegExp.prototype.match`
-*  `RegExp.prototype.replace`
-*  `RegExp.prototype.split`
-*  `RegExp.prototype.search`
-*  `String.prototype.codePointAt`
-*  `String.prototype.fromCodePoint`
-*  `String.prototype.padStart`
-*  `String.prototype.padEnd`
-*  `String.prototype.repeat`
-*  `String.prototype.startsWith`
-*  `String.prototype.endsWith`
-*  `String.prototype.includes`
+ * `Array.prototype.copyWithin`
+ * `Array.prototype.find`
+ * `Array.prototype.findIndex`
+ * `Array.prototype.fill`
+ * `Array.prototype.includes`
+ * `Function.prototype.name`
+ * `RegExp.prototype.flags`
+ * `RegExp.prototype.match`
+ * `RegExp.prototype.replace`
+ * `RegExp.prototype.split`
+ * `RegExp.prototype.search`
+ * `String.prototype.codePointAt`
+ * `String.prototype.fromCodePoint`
+ * `String.prototype.padStart`
+ * `String.prototype.padEnd`
+ * `String.prototype.repeat`
+ * `String.prototype.startsWith`
+ * `String.prototype.endsWith`
+ * `String.prototype.includes`
