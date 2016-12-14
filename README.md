@@ -66,11 +66,13 @@ to refer to the global object. As an example:
 ```
 // this case will work.
 var a = Math.cos(90);
+var { cos } = Math;
 
 // this case will not work because Math doesn't have a direct
 // property access in the code.
 function getMath() { return Math; }
 var b = getMath().cos(90);
+var { cos } = getMath();
 ```
 
 The second case in which the plugin will fail is when code refers to a new built-in
@@ -80,17 +82,22 @@ static or instance method in a dynamic way. For example:
 // these cases will work.
 var a = "foo".startsWith("f");
 var b = "foo"["startsWith"]("f");
+var { startsWith } = "foo";
 var c = Math.cos(90);
 var d = Math["cos"](90);
+var { cos } = Math;
 
 // these cases will not work.
 var e = "foo"["starts" + "With"]("f");
-var f = "startsWith".forEach(method => "foo"[method]("f"))[0];
-var g = Math["c" + "os"](90);
+var { ["starts" + "With"]: f } = "foo";
+var g = "startsWith".forEach(method => "foo"[method]("f"))[0];
+var h = Math["c" + "os"](90);
+var { ["c" + "os"]: i } = Math;
 function getCos() {
   return "cos";
 }
-var h = Math[getCos()](90);
+var j = Math[getCos()](90);
+var { [getCos()]: k } = Math;
 ```
 
 ##Instance methods may produce false positives
@@ -105,10 +112,12 @@ instance method. For example:
 ```
 // this triggers an import of String.prototype.startsWith.
 var a = "foo".startsWith("f");
+var { startsWith } = "foo";
 
 // this also triggers an import of String.prototype.startsWith (false positive).
 var b = null;
 var c = b.startsWith("f");
+var { startsWith } = b;
 
 // this also triggers an import of String.prototype.startsWith (false positive).
 var e = b["startsWith"];

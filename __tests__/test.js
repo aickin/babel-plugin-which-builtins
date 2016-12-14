@@ -15,11 +15,34 @@ function getBuiltinsForCode(code) {
 test('test static method', () => {
   expect(getBuiltinsForCode('Array.from([1,2,3]);')).toEqual(['core-js/modules/es6.array.from','core-js/modules/es6.array.iterator']);
   expect(getBuiltinsForCode('Array.of([1,2,3]);')).toEqual(['core-js/modules/es6.array.iterator','core-js/modules/es6.array.of']);
+
+  // negative cases, calling a static method on the wrong object.
+  expect(getBuiltinsForCode('Reflect.from([1,2,3]);')).toEqual(['core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('Reflect.of([1,2,3]);')).toEqual(['core-js/modules/es6.array.iterator']);
 });
 
 test('test computed static method', () => {
   expect(getBuiltinsForCode('Array["from"]([1,2,3]);')).toEqual(['core-js/modules/es6.array.from','core-js/modules/es6.array.iterator']);
   expect(getBuiltinsForCode('Array["of"]([1,2,3]);')).toEqual(['core-js/modules/es6.array.iterator','core-js/modules/es6.array.of']);
+
+  // negative cases, calling a static method on the wrong object.
+  expect(getBuiltinsForCode('Reflect["from"]([1,2,3]);')).toEqual(['core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('Reflect["of"]([1,2,3]);')).toEqual(['core-js/modules/es6.array.iterator']);
+});
+
+test('test destructure static method', () => {
+  expect(getBuiltinsForCode('var { from } = Array;')).toEqual(['core-js/modules/es6.array.from','core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('var { foo, from } = Array;')).toEqual(['core-js/modules/es6.array.from','core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('var { from: foo } = Array;')).toEqual(['core-js/modules/es6.array.from','core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('var { foo, from: bar } = Array;')).toEqual(['core-js/modules/es6.array.from','core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('const { of } = Array;')).toEqual(['core-js/modules/es6.array.iterator','core-js/modules/es6.array.of']);
+
+  // negative cases, calling a static method on the wrong object.
+  expect(getBuiltinsForCode('var { from } = Reflect;')).toEqual(['core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('var { foo, from } = Reflect;')).toEqual(['core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('var { from: foo } = Reflect;')).toEqual(['core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('var { foo, from: bar } = Reflect;')).toEqual(['core-js/modules/es6.array.iterator']);
+  expect(getBuiltinsForCode('const { of } = Reflect;')).toEqual(['core-js/modules/es6.array.iterator']);
 });
 
 test('test ES5 static method', () => {
@@ -116,4 +139,12 @@ test('computed instance method', () => {
 
 test('instance method in a function', () => {
   expect(getBuiltinsForCode('function bar() { foo.codePointAt(); }')).toEqual(['core-js/modules/es6.array.iterator','core-js/modules/es6.string.code-point-at']);
+})
+
+test('destructured instance method', () => {
+  expect(getBuiltinsForCode('var { codePointAt } = foo;')).toEqual(['core-js/modules/es6.array.iterator','core-js/modules/es6.string.code-point-at']);
+})
+
+test('destructured instance method 2', () => {
+  expect(getBuiltinsForCode('const { includes } = foo;')).toEqual(['core-js/modules/es6.array.iterator','core-js/modules/es6.string.includes','core-js/modules/es7.array.includes']);
 })

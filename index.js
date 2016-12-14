@@ -124,6 +124,34 @@ function isFromInherentScope(name, scope) {
   return currentScope.hasBinding(name);
 }
 
+function handleStaticPropertyAccess(objectName, propertyName, builtins) {
+  const localBuiltins = builtins;
+  if (staticMethods[objectName]
+      && staticMethods[objectName][propertyName]) {
+    // this is an ES2015/2016/2017 static method that is being used in the code.
+    localBuiltins[staticMethods[objectName][propertyName]] = true;
+  }
+}
+
+function handleInstancePropertyAccess(propertyName, builtins) {
+  const localBuiltins = builtins;
+  if (instanceMethods[propertyName]) {
+    // this is **potentially** a use of an ES2015/2016/2017/2017 instance method.
+    // include that instance method's polyfill in case.
+    instanceMethods[propertyName].forEach((module) => {
+      localBuiltins[module] = true;
+    });
+  }
+}
+
+function handlePropertyAccess(objectName, propertyName, scope, builtins) {
+  if (objectName && (!scope.hasBinding(objectName) || isFromInherentScope(objectName, scope))) {
+    // this is an ES2015/2016/2017 static method that is being used in the code.
+    handleStaticPropertyAccess(objectName, propertyName, builtins);
+  }
+  handleInstancePropertyAccess(propertyName, builtins);
+}
+
 function whichBuiltinsPlugin({ types: t }) {
   let builtins = {};
   return {
@@ -150,6 +178,23 @@ function whichBuiltinsPlugin({ types: t }) {
         },
       },
 
+      VariableDeclarator(path) {
+        // we should ignore this variable declaration if it's not a destructuring
+        // declaration.
+        if (!t.isObjectPattern(path.node.id) || !t.isIdentifier(path.node.init)) {
+          return;
+        }
+
+        const objectName = path.node.init.name;
+        path.node.id.properties.forEach((property) => {
+          if (!t.isProperty(property) || !t.isIdentifier(property.key)) {
+            return;
+          }
+          const propertyName = property.key.name;
+          handlePropertyAccess(objectName, propertyName, path.scope, builtins);
+        });
+      },
+
       MemberExpression(path) {
         const object = path.node.object;
 
@@ -166,24 +211,12 @@ function whichBuiltinsPlugin({ types: t }) {
           return;
         }
 
-        if (t.isIdentifier(object)
-            && staticMethods[object.name]
-            && staticMethods[object.name][propertyName]
-            && (
-              !path.scope.hasBinding(object.name) || isFromInherentScope(object.name, path.scope)
-            )) {
-          // this is an ES2015/2016/2017 static method that is being used in the code.
-          builtins[staticMethods[object.name][propertyName]] = true;
-          return;
+        let objectName = null;
+        if (t.isIdentifier(object)) {
+          objectName = object.name;
         }
 
-        if (instanceMethods[propertyName]) {
-          // this is **potentially** a use of an ES2015/2016/2017/2017 instance method.
-          // include that instance method's polyfill in case.
-          instanceMethods[propertyName].forEach((module) => {
-            builtins[module] = true;
-          });
-        }
+        handlePropertyAccess(objectName, propertyName, path.scope, builtins);
       },
     },
   };
