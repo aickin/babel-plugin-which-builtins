@@ -1,11 +1,11 @@
-#babel-plugin-which-builtins
+# babel-plugin-which-builtins
 
 This is a Babel plugin which attempts to determine which ECMAScript 2015/2016/2017
 library built-ins are used by a codebase and only import polyfills for just the
 built-ins which are actually used. It is a replacement for importing the
 entirety of `babel-polyfill`.
 
-##Instructions
+## Instructions
 
 First install the plugin to your project, along with `core-js` and `regenerator-runtime`:
 
@@ -22,19 +22,19 @@ code. For example, in a `.babelrc` file:
 }
 ```
 
-##What does it do?
+## What does it do?
 
 When this plugin encounters code that seems to use new built-in JavaScript global
 objects, static methods, or instance methods, it adds an `import` declaration
 for a polyfill that will add that built-in. For example, with this input:
 
-```
+```js
 const foo = Array.from([1,2,3]);
 ```
 
 the plugin will produce this output:
 
-```
+```js
 import "core-js/modules/es6.array.from"
 import "core-js/modules/es6.array.iterator"
 const foo = Array.from([1,2,3]);
@@ -48,7 +48,7 @@ In additon to the ECMAScript polyfills of `core-js`, the plugin also looks for
 and polyfills references to `regeneratorRuntime`, which are created by the standard
 Babel plugin for transforming generators.
 
-##When does the plugin fail?
+## When does the plugin fail?
 
 Unfortunately, in a completely dynamic language like JavaScript, static analysis
 can only go so far, and as a result `babel-plugin-which-builtins` cannot catch
@@ -59,7 +59,7 @@ The first case in which the plugin will fail is when code refers to one of the
 built-in globals that has new methods (like `Math` or `Array`) using dynamic code
 to refer to the global object. As an example:
 
-```
+```js
 // this case will work.
 var a = Math.cos(90);
 var { cos } = Math;
@@ -74,7 +74,7 @@ var { cos } = getMath();
 The second case in which the plugin will fail is when code refers to a new built-in
 static or instance method in a dynamic way. For example:
 
-```
+```js
 // these cases will work.
 var a = "foo".startsWith("f");
 var b = "foo"["startsWith"]("f");
@@ -96,7 +96,7 @@ var j = Math[getCos()](90);
 var { [getCos()]: k } = Math;
 ```
 
-##Instance methods may produce false positives
+## Instance methods may produce false positives
 
 Some of the new built-ins in ES2015/2016/2017 are instance methods, like
 `Array.prototype.find` or `String.prototype.startsWith`. It's very difficult
@@ -105,7 +105,7 @@ in JavaScript, so this plugin is conservative and assumes that any reference to
 a property with the same name of a new instance method is a reference to that
 instance method. For example:
 
-```
+```js
 // this triggers an import of String.prototype.startsWith.
 var a = "foo".startsWith("f");
 var { startsWith } = "foo";
@@ -122,79 +122,79 @@ var e = b["startsWith"];
 The theory here is that including an instance method polyfill when it's not
 needed is better than not including it when it is needed.
 
-#What features are polyfilled?
+# What features are polyfilled?
 * Generators
- * `regeneratorRuntime`
+  * `regeneratorRuntime`
 * Global objects
- * `DataView`
- * `Int8Array`
- * `Uint8Array`
- * `Uint8ClampedArray`
- * `Int16Array`
- * `Uint16Array`
- * `Int32Array`
- * `Uint32Array`
- * `Float32Array`
- * `Float64Array`
- * `Map`
- * `Set`
- * `WeakMap`
- * `WeakSet`
- * `Promise`
- * `Symbol`
- * `Reflect`
+  * `DataView`
+  * `Int8Array`
+  * `Uint8Array`
+  * `Uint8ClampedArray`
+  * `Int16Array`
+  * `Uint16Array`
+  * `Int32Array`
+  * `Uint32Array`
+  * `Float32Array`
+  * `Float64Array`
+  * `Map`
+  * `Set`
+  * `WeakMap`
+  * `WeakSet`
+  * `Promise`
+  * `Symbol`
+  * `Reflect`
 * Static methods
- * `Array.from`
- * `Array.of`
- * `Math.acosh`
- * `Math.asinh`
- * `Math.atanh`
- * `Math.cbrt`
- * `Math.clz32`
- * `Math.cosh`
- * `Math.expm1`
- * `Math.fround`
- * `Math.hypot`
- * `Math.imul`
- * `Math.log1p`
- * `Math.log10`
- * `Math.log2`
- * `Math.sign`
- * `Math.sinh`
- * `Math.tanh`
- * `Math.trunc`
- * `Number.isFinite`
- * `Number.isInteger`
- * `Number.isSafeInteger`
- * `Number.isNaN`
- * `Number.EPSILON`
- * `Number.MIN_SAFE_INTEGER`
- * `Number.MAX_SAFE_INTEGER`
- * `Object.assign`
- * `Object.is`
- * `Object.getOwnPropertySymbols`
- * `Object.setPrototypeOf`
- * `Object.values`
- * `Object.entries`
- * `Object.getOwnPropertyDescriptors`
- * `String.raw`
+  * `Array.from`
+  * `Array.of`
+  * `Math.acosh`
+  * `Math.asinh`
+  * `Math.atanh`
+  * `Math.cbrt`
+  * `Math.clz32`
+  * `Math.cosh`
+  * `Math.expm1`
+  * `Math.fround`
+  * `Math.hypot`
+  * `Math.imul`
+  * `Math.log1p`
+  * `Math.log10`
+  * `Math.log2`
+  * `Math.sign`
+  * `Math.sinh`
+  * `Math.tanh`
+  * `Math.trunc`
+  * `Number.isFinite`
+  * `Number.isInteger`
+  * `Number.isSafeInteger`
+  * `Number.isNaN`
+  * `Number.EPSILON`
+  * `Number.MIN_SAFE_INTEGER`
+  * `Number.MAX_SAFE_INTEGER`
+  * `Object.assign`
+  * `Object.is`
+  * `Object.getOwnPropertySymbols`
+  * `Object.setPrototypeOf`
+  * `Object.values`
+  * `Object.entries`
+  * `Object.getOwnPropertyDescriptors`
+  * `String.raw`
 * Instance methods
- * `Array.prototype.copyWithin`
- * `Array.prototype.find`
- * `Array.prototype.findIndex`
- * `Array.prototype.fill`
- * `Array.prototype.includes`
- * `Function.prototype.name`
- * `RegExp.prototype.flags`
- * `RegExp.prototype.match`
- * `RegExp.prototype.replace`
- * `RegExp.prototype.split`
- * `RegExp.prototype.search`
- * `String.prototype.codePointAt`
- * `String.prototype.fromCodePoint`
- * `String.prototype.padStart`
- * `String.prototype.padEnd`
- * `String.prototype.repeat`
- * `String.prototype.startsWith`
- * `String.prototype.endsWith`
- * `String.prototype.includes`
+  * `Array.prototype.copyWithin`
+  * `Array.prototype.find`
+  * `Array.prototype.findIndex`
+  * `Array.prototype.fill`
+  * `Array.prototype.includes`
+  * `Function.prototype.name`
+  * `RegExp.prototype.flags`
+  * `RegExp.prototype.match`
+  * `RegExp.prototype.replace`
+  * `RegExp.prototype.split`
+  * `RegExp.prototype.search`
+  * `String.prototype.codePointAt`
+  * `String.prototype.fromCodePoint`
+  * `String.prototype.padStart`
+  * `String.prototype.padEnd`
+  * `String.prototype.repeat`
+  * `String.prototype.startsWith`
+  * `String.prototype.endsWith`
+  * `String.prototype.includes`
